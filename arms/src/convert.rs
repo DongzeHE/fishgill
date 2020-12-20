@@ -149,7 +149,7 @@ pub fn bam2rad(input_file: String, rad_file: String, num_threads: u32, log: &slo
         data.write_all(&typeid.to_le_bytes())
             .expect("coudn't write to output file");
 
-        println!("{:?}", rec);
+        println!("{:?}", rec.inner());
 
         std::process::exit(0x0100);
         // read-level
