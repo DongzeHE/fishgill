@@ -322,7 +322,7 @@ pub fn bam2rad(input_file: String, rad_file: String, num_threads: u32, log: &slo
 
         // if this is a new read update the old variables
         {
-            let bc_string_in = str::from_utf8(rec.aux(b"CR").unwrap().string()).unwrap();
+            let bc_string_in = str::from_utf8(rec.aux(b"CB").unwrap().string()).unwrap();
             let umi_string_in = str::from_utf8(rec.aux(b"UR").unwrap().string()).unwrap();
 
             let bc_string = bc_string_in.replacen('N', "A", 1);
