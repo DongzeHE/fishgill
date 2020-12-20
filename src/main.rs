@@ -30,7 +30,8 @@ fn main() {
             Arg::from("-t, --threads 'number of threads to use for processing'")
                 .default_value(&max_num_threads),
         )
-        .arg(Arg::from("-o, --output=<rad-file> 'output RAD file'"));
+        .arg(Arg::from("-o, --output=<rad-file> 'output RAD file'")
+    );
 
 
     let filter_app = App::new("filter")
@@ -67,7 +68,7 @@ fn main() {
 
     if let Some(ref t) = opts.subcommand_matches("convert") {
         let input_file: String = t.value_of_t("bam").unwrap();
-        let rad_file: String = t.value_of_t("txplen").unwrap();
+        let rad_file: String = t.value_of_t("output").unwrap();
         let num_threads: u32 = t.value_of_t("threads").unwrap();
         arms::convert::bam2rad(input_file, rad_file, num_threads, &log)
     }
