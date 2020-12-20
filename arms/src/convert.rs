@@ -149,11 +149,8 @@ pub fn bam2rad(input_file: String, rad_file: String, num_threads: u32, log: &slo
         data.write_all(&typeid.to_le_bytes())
             .expect("coudn't write to output file");
 
-        println!("{:?}", rec.inner());
-
-        std::process::exit(0x0100);
         // read-level
-        let bc_string_in = str::from_utf8(rec.aux(b"CR").unwrap().string()).unwrap();
+        let bc_string_in = str::from_utf8(rec.aux(b"CB").unwrap().string()).unwrap();
         let umi_string_in = str::from_utf8(rec.aux(b"UR").unwrap().string()).unwrap();
         let bclen = bc_string_in.len() as u16;
         let umilen = umi_string_in.len() as u16;
