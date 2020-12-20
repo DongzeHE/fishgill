@@ -149,6 +149,8 @@ pub fn bam2rad(input_file: String, rad_file: String, num_threads: u32, log: &slo
         data.write_all(&typeid.to_le_bytes())
             .expect("coudn't write to output file");
 
+        println!("{:?}", rec);
+
         // read-level
         let bc_string_in = str::from_utf8(rec.aux(b"CR").unwrap().string()).unwrap();
         let umi_string_in = str::from_utf8(rec.aux(b"UR").unwrap().string()).unwrap();
