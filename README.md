@@ -1,5 +1,5 @@
 # fishgill
-filter BAM file and convert it to RAD
+Fishgill can filter BAM file and convert it to RAD
 
 ## filter
 filter function filter the alignments that are outside the corresponding txp terminal kilobase. 
