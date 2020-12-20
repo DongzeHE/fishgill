@@ -5,7 +5,6 @@ use std::io::Write;
 
 use itertools::Itertools;
 
-use crate as arms;
 use crate::config::MIL;
 
 use rust_htslib::bam;
