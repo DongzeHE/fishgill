@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 csv = "1.1.4"
-rust-htslib = "*"
+rust-htslib = { version = "0.35.2", default-features = false, features = ["bzip2", "lzma"] }
 itertools = "0.7.9"
 indicatif = "0.15.0"
 slog = "2.5.2"
