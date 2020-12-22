@@ -10,7 +10,7 @@ use crate::config::MIL;
 use rust_htslib::bam;
 use rust_htslib::bam::{Read, Record};
 use rust_htslib::bam::record::Aux;
-use rust_htslib::bam::record::{Cigar};
+// use rust_htslib::bam::record::{Cigar};
 use slog::{info, warn};
 
 #[derive(PartialEq, Eq, Hash)]
@@ -23,6 +23,7 @@ enum KeyT {
 pub fn filter_bam(bam_file: &str, 
                   txplen_file: &str, 
                   num_threads: usize,
+                  fltr_unsplcd:bool,
                   log: &slog::Logger,
                 ) {
     info!(log, "Using Input BAM file: {}", bam_file);
@@ -183,31 +184,35 @@ pub fn filter_bam(bam_file: &str,
                     let read_start_pos = txplen_vec[record.tid() as usize] - record.pos();
                     // if the distance is over 1000, we skip it
                     if read_start_pos > 1000 {
-                        skip_alignments.insert(key);
+                        if  fltr_unsplcd{
+                            skip_alignments.insert(key);
+                        } else if tid_to_type[record.tid() as usize] == 1 {
+                            skip_alignments.insert(key);
+                        }
                     }
 
-                    let mut read_length = 0;
-                    for (_segment_index, cigar) in alignments[*val].cigar()
-                        .iter()
-                        .enumerate()
-                    {
-                        match cigar {
-                            &Cigar::Ins(_) => {
-                                if read_length < 23 {
-                                    skip_alignments.insert(key);
-                                    break;
-                                }
-                            },
+                    // let mut read_length = 0;
+                    // for (_segment_index, cigar) in alignments[*val].cigar()
+                    //     .iter()
+                    //     .enumerate()
+                    // {
+                    //     match cigar {
+                    //         &Cigar::Ins(_) => {
+                    //             if read_length < 23 {
+                    //                 skip_alignments.insert(key);
+                    //                 break;
+                    //             }
+                    //         },
 
-                            &Cigar::Match(l) | &Cigar::Equal(l) |
-                            &Cigar::RefSkip(l) | &Cigar::Del(l) |
-                            &Cigar::Pad(l) | &Cigar::SoftClip(l) |
-                            &Cigar::HardClip(l) | &Cigar::Diff(l) => {
-                                read_length += l;
-                                continue
-                            },
-                        }//end-match
-                    }//end for
+                    //         &Cigar::Match(l) | &Cigar::Equal(l) |
+                    //         &Cigar::RefSkip(l) | &Cigar::Del(l) |
+                    //         &Cigar::Pad(l) | &Cigar::SoftClip(l) |
+                    //         &Cigar::HardClip(l) | &Cigar::Diff(l) => {
+                    //             read_length += l;
+                    //             continue
+                    //         },
+                    //     }//end-match
+                    // }//end for
                 }//end-for
             }//end-for
 
@@ -240,28 +245,40 @@ pub fn filter_bam(bam_file: &str,
                 }
 
                 let mut skip_alignment = false;
-                let mut read_length = 0;
-                for (_segment_index, cigar) in alignment.cigar()
-                    .iter()
-                    .enumerate()
-                {
-                    match cigar {
-                        &Cigar::Ins(_) => {
-                            if read_length < 23 {
-                                skip_alignment = true;
-                                break;
-                            }
-                        },
+                // let mut read_length = 0;
 
-                        &Cigar::Match(l) | &Cigar::Equal(l) |
-                        &Cigar::RefSkip(l) | &Cigar::Del(l) |
-                        &Cigar::Pad(l) | &Cigar::SoftClip(l) |
-                        &Cigar::HardClip(l) | &Cigar::Diff(l) => {
-                            read_length += l;
-                            continue
-                        },
-                    }//end-match
-                }//end for
+                
+                let read_start_pos = txplen_vec[alignment.tid() as usize] - alignment.pos();
+                // if the distance is over 1000, we skip it
+                if read_start_pos > 1000 {
+                    if  fltr_unsplcd{
+                        skip_alignment = true;
+                    } else if tid_to_type[alignment.tid() as usize] == 1 {
+                        skip_alignment = true;
+                    }
+                }
+
+                // for (_segment_index, cigar) in alignment.cigar()
+                //     .iter()
+                //     .enumerate()
+                // {
+                //     match cigar {
+                //         &Cigar::Ins(_) => {
+                //             if read_length < 23 {
+                //                 skip_alignment = true;
+                //                 break;
+                //             }
+                //         },
+
+                //         &Cigar::Match(l) | &Cigar::Equal(l) |
+                //         &Cigar::RefSkip(l) | &Cigar::Del(l) |
+                //         &Cigar::Pad(l) | &Cigar::SoftClip(l) |
+                //         &Cigar::HardClip(l) | &Cigar::Diff(l) => {
+                //             read_length += l;
+                //             continue
+                //         },
+                //     }//end-match
+                // }//end for
 
                 if index%2 == 0 {
                     if !skip_alignment { buffer.push(alignment); }

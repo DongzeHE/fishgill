@@ -40,6 +40,7 @@ fn main() {
     .author(crate_authors)
     .arg(Arg::from("-b, --bam=<bam-file> 'input SAM/BAM file'"))
     .arg(Arg::from("-l, --txplen=<txplen-file> 'input txplen tsv file'"))
+    .arg(Arg::from("-u, --unspliced=<bool> 'whether filter alignments of unspliced txp'"))
     .arg(
         Arg::from("-t, --threads 'number of threads to use for processing'")
             .default_value(&max_num_threads),
@@ -76,8 +77,9 @@ fn main() {
     if let Some(ref t) = opts.subcommand_matches("filter") {
         let bam_file: String = t.value_of_t("bam").unwrap();
         let txplen_file: String = t.value_of_t("txplen").unwrap();
+        let fltr_unsplcd: bool = t.value_of_t("unspliced").unwrap();
         let num_threads: usize = t.value_of_t("threads").unwrap();
-        arms::filter::filter_bam(&bam_file, &txplen_file, num_threads, &log)
+        arms::filter::filter_bam(&bam_file, &txplen_file, num_threads,fltr_unsplcd, &log)
     }
 
 }
