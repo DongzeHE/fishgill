@@ -38,7 +38,8 @@ fn main() {
     .about("remove alignments outside terminal kilobase")
     .version(version)
     .author(crate_authors)
-    .arg(Arg::from("-b, --bam=<bam-file> 'input SAM/BAM file'"))
+    .arg(Arg::from("-i, --ibam=<input-bam-file> 'input BAM file'"))
+    .arg(Arg::from("-o, --obam=<bam-file> 'output BAM file'"))
     .arg(Arg::from("-l, --txplen=<txplen-file> 'input txplen tsv file'"))
     .arg(Arg::from("-u, --unspliced=<bool> 'whether filter alignments of unspliced txp'"))
     .arg(
@@ -75,11 +76,12 @@ fn main() {
     }
 
     if let Some(ref t) = opts.subcommand_matches("filter") {
-        let bam_file: String = t.value_of_t("bam").unwrap();
+        let in_bam_file: String = t.value_of_t("ibam").unwrap();
+        let out_bam_file: String = t.value_of_t("obam").unwrap();
         let txplen_file: String = t.value_of_t("txplen").unwrap();
         let fltr_unsplcd: bool = t.value_of_t("unspliced").unwrap();
         let num_threads: usize = t.value_of_t("threads").unwrap();
-        arms::filter::filter_bam(&bam_file, &txplen_file, num_threads,fltr_unsplcd, &log)
+        arms::filter::filter_bam(&in_bam_file, &out_bam_file, &txplen_file, num_threads,fltr_unsplcd, &log)
     }
 
 }

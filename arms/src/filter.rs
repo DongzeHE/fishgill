@@ -20,25 +20,26 @@ enum KeyT {
 }
 
 
-pub fn filter_bam(bam_file: &str, 
+pub fn filter_bam(in_bam_file: &str, 
+                  out_bam_file: &str, 
                   txplen_file: &str, 
                   num_threads: usize,
                   fltr_unsplcd:bool,
                   log: &slog::Logger,
                 ) {
-    info!(log, "Using Input BAM file: {}", bam_file);
+    info!(log, "Using Input BAM file: {}", in_bam_file);
 
     // opening input BAM
-    let mut input_bam = bam::Reader::from_path(bam_file)
+    let mut input_bam = bam::Reader::from_path(in_bam_file)
         .expect("Can't open BAM file");
     let header = bam::Header::from_template(input_bam.header());
 
     // creating the output BAM
-    let mut out_bam_file = bam_file.to_string();
-    let bam_name_offset = out_bam_file.find(".bam")
-        .unwrap_or(out_bam_file.len());
-    out_bam_file.replace_range(bam_name_offset..,
-                           "_filtered.bam");
+    // let mut out_bam_file = in_bam_file.to_string();
+    // let bam_name_offset = out_bam_file.find(".bam")
+    //     .unwrap_or(out_bam_file.len());
+    // out_bam_file.replace_range(bam_name_offset..,
+    //                        "_filtered.bam");
     let mut output_bam = bam::Writer::from_path(out_bam_file, &header, bam::Format::BAM)
         .expect("can't open BAM file to dump output");
 
