@@ -121,6 +121,7 @@ pub fn filter_bam(in_bam_file: &str,
         let mut alignments: Vec<Record> = read_group.collect();
         let num_alignments = alignments.len();
         let num_reads: i64 = num_alignments as i64 / 2;
+        let is_multi_aligned = num_reads > 1;
 
         let mut is_discordant: bool = false;
         for i in (0..num_alignments).step(2){
@@ -167,7 +168,7 @@ pub fn filter_bam(in_bam_file: &str,
                     .or_insert(Vec::new())
                     .push(index);
             }//end-bucket for
-
+            
             let mut skip_read = false;
             let mut skip_alignments = HashSet::new();
             for (key, vals) in &bucket {
@@ -184,7 +185,7 @@ pub fn filter_bam(in_bam_file: &str,
                     // compute the distance of pos to 3 prime end
                     let read_start_pos = txplen_vec[record.tid() as usize] - record.pos();
                     // if the distance is over 1000, we skip it
-                    if read_start_pos > 1000 {
+                    if read_start_pos > 1000 && is_multi_aligned {
                         if  fltr_unsplcd{
                             skip_alignments.insert(key);
                         } else if tid_to_type[record.tid() as usize] == 1 {
@@ -240,6 +241,7 @@ pub fn filter_bam(in_bam_file: &str,
         } else {
             let mut buffer = Vec::new();
             let mut filtered_algns = Vec::new();
+
             for (index, mut alignment) in alignments.into_iter().enumerate() {
                 if has_nh_tag {
                     alignment.remove_aux("NH".as_bytes());
@@ -248,10 +250,9 @@ pub fn filter_bam(in_bam_file: &str,
                 let mut skip_alignment = false;
                 // let mut read_length = 0;
 
-                
                 let read_start_pos = txplen_vec[alignment.tid() as usize] - alignment.pos();
                 // if the distance is over 1000, we skip it
-                if read_start_pos > 1000 {
+                if read_start_pos > 1000 && is_multi_aligned{
                     if  fltr_unsplcd{
                         skip_alignment = true;
                     } else if tid_to_type[alignment.tid() as usize] == 1 {
